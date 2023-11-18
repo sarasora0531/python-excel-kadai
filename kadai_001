@@ -1,0 +1,63 @@
+import pandas as pd
+from datetime import datetime
+import openpyxl
+from openpyxl.styles import Font, Alignment, Border, Side
+from openpyxl.utils.dataframe import dataframe_to_rows
+
+# データの準備
+invoice_data = {
+    "商品名": ["A", "B"],
+    "数量": [2, 1],
+    "単価": [10000, 15000],
+    "金額": [20000, 15000]
+}
+df = pd.DataFrame(invoice_data)
+
+# 現在の日付を取得してファイル名を設定
+current_date = datetime.now().strftime("%Y%m%d")
+file_name = f"請求書_{current_date}.xlsx"
+
+# Excelファイルの作成
+wb = openpyxl.Workbook()
+ws = wb.active
+
+# ヘッダー情報の追加
+header_info = [
+    ["請求書"],
+    ["株式会社ABC", "", "", "No.", "0001"],
+    ["〒101-0022 東京都千代田区神田練塀町300", "", "", "日付", "11月18日"],
+    ["TEL:03-1234-5678 FAX:03-1234-5678"],
+    ["担当者名:鈴木一郎 様"]
+]
+
+for row in header_info:
+    ws.append(row)
+
+# 商品リストの追加
+for r in dataframe_to_rows(df, index=False, header=True):
+    ws.append(r)
+
+# 小計、消費税、合計の追加
+summary_info = [
+    ["小計", "", "", "35,000"],
+    ["消費税", "", "", "3,500"],
+    ["合計", "", "", "38,500"]
+]
+
+for row in summary_info:
+    ws.append(row)
+
+# スタイルの設定
+for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=5):
+    for cell in row:
+        cell.font = Font(name='Arial', size=11)
+        cell.alignment = Alignment(horizontal='left', vertical='center')
+        cell.border = Border(left=Side(style='thin'), 
+                             right=Side(style='thin'), 
+                             top=Side(style='thin'), 
+                             bottom=Side(style='thin'))
+
+# ファイルの保存
+wb.save(file_name)
+
+file_name
