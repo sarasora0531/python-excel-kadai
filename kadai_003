@@ -1,0 +1,55 @@
+import pandas as pd
+
+# Data for 2022
+data_2022 = {
+    "売上年": [2022]*11,
+    "商品": ["紅茶", "ハチミツ", "セッケン", "紅茶", "アロマキャンドル", "ハチミツ", "ハチミツ", "ワイングラス", "アロマキャンドル", "包丁", "水筒"],
+    "金額（千円）": [1200, 1000, 1300, 800, 900, 300, 560, 850, 810, 940, 1150]
+}
+df_2022 = pd.DataFrame(data_2022)
+
+# Data for 2023
+data_2023 = {
+    "売上年": [2023]*11,
+    "商品": ["紅茶", "ハチミツ", "水筒", "コーヒー豆", "セッケン", "紅茶", "アロマキャンドル", "ワイングラス", "包丁", "フライパン", "水筒"],
+    "金額（千円）": [1200, 1000, 250, 860, 1300, 670, 900, 850, 940, 670, 1150]
+}
+df_2023 = pd.DataFrame(data_2023)
+
+# Concatenating DataFrames
+concatenated_df = pd.concat([df_2022, df_2023])
+
+# Grouping by product and year, and summing the amounts
+grouped_df = concatenated_df.groupby(["商品", "売上年"]).sum().reset_index()
+
+grouped_df.head(20)  # Displaying the first 20 rows for overview
+
+# ライブラリのインポート
+import pandas as pd
+import openpyxl
+from openpyxl.styles import PatternFill
+
+# 既に作成したgrouped_dfを利用する
+# Google Colabにおいては、直接ファイルパスを指定する
+file_path = '売上集計表.xlsx'
+grouped_df.to_excel(file_path, index=False, sheet_name='集計データ')
+
+# openpyxlを使用してスタイルを設定する
+workbook = openpyxl.load_workbook(file_path)
+sheet = workbook['集計データ']
+
+# ヘッダー行のスタイルを設定（薄いグレーの背景）
+for cell in sheet[1]:
+    cell.fill = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid")
+
+# 変更を保存
+workbook.save(file_path)
+
+# Google Colabの場合、以下のコードでダウンロードリンクを生成
+try:
+    from google.colab import files
+    files.download(file_path)
+except ImportError:
+    # Google Colab以外の環境では、例外が発生するので無視する
+    pass
+
